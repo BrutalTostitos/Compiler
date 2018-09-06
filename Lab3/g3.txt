@@ -1,0 +1,27 @@
+NUM -> \d+
+ID -> [A-Za-z]\w*
+LP -> [(]
+RP -> [)]
+ADDOP -> [-+]
+MULOP -> [*/]
+SEMI -> ;
+
+S -> stmt SEMI S | λ
+stmt -> LBRACE S RBRACE | assign
+assign -> ID EQ expr
+expr -> term expr'
+expr' -> ADDOP term expr' | λ
+term -> factor term' 
+term' -> MULOP factor term' | λ
+factor -> ID | LP expr RP | NUM | func-call
+func-call -> ID LP plist RP
+plist -> λ | expr | expr COMMA plist'
+plist' -> expr | expr COMMA plist'
+X -> Y Z 
+Y -> Z W
+Z -> λ | LP
+W -> X | RP
+A -> B C
+C -> D E
+D -> λ | LP
+E -> RP | D

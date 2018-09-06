@@ -1,0 +1,52 @@
+TITLE_AND_COMMENT -> ^(
+    (?!\s*Ingredients\.)(?!\s*Cooking\s+time\b)(?!\s*Pre-heat\s+oven\s+to\b)(?!\s*Method)
+    [^.]+\.)
+    (
+        (?!\s*Ingredients\.)(?!\s*Cooking\s+time\b)(?!\s*Pre-heat\s+oven\s+to\b)(?!\s*Method)
+        [^.]+\.
+    )?
+COOKING_TIME -> \bCooking\s+time\b
+INGREDIENTS -> \bIngredients\b
+PREHEAT_OVEN_TO -> \bPre-heat\s+oven\s+to\b
+NUM -> \b(\d+/\d+|\d+-\d+/\d+|\d+)\b
+TIMEUNIT -> \b(hours|minutes)\b
+DEGREES -> \bdegrees\b
+GAS_MARK -> \bgas\s+mark\b
+THERMOSTAT -> \b(thermostat|Th)\b
+STUFE -> \bStufe\b
+SERVES -> \bServes\b
+METHOD -> \bMethod\b
+PUT -> \bPut\b
+FOLD -> \bFold\b
+CLEAN -> \bClean\b
+INTO -> \binto\b
+NUMBERST -> \b(\d*)(11|12|13|14|15|16|17|18|19)th\b | \b(\d*)(0|2|3|4|5|6|7|8|9)1st\b | \b(\d*)(0|2|3|4|5|6|7|8|9)2nd\b | \b(\d*)(0|2|3|4|5|6|7|8|9)3rd\b | \b(\d*)(4|5|6|7|8|9|0)th\b | \b1st\b | \b2nd\b | \b3rd\b
+MIXINGBOWL -> \bmixing\sbowl\.
+DESCRIPTIVE -> \b(heaped|heaping|packed|level)\b
+MEASURE -> \b(oz|lb|pinch|pinches|quart|quarts|dash|dashes|cup|cups|teaspoon|teaspoons|tablespoon|tablespoons|tsp|T|t|tbsp)\b
+WORD -> \b([a-z]+)\b
+COLON -> :
+PERIOD -> \.
+
+S -> TITLE_AND_COMMENT 
+    optionalIngredients 
+    optionalCookingTime 
+    optionalPreheat 
+    method 
+    optionalServes
+optionalIngredients -> INGREDIENTS PERIOD ingredientList | lambda
+ingredientList -> ingredient ingredientList | lambda
+ingredient -> optionalInitialValue optionalMeasureType wordList PERIOD
+optionalMeasureType -> optionalDescriptive MEASURE | lambda
+optionalDescriptive -> DESCRIPTIVE | lambda
+optionalInitialValue -> NUM | lambda
+optionalCookingTime -> COOKING_TIME COLON NUM TIMEUNIT PERIOD | lambda
+optionalPreheat -> PREHEAT_OVEN_TO tempSpec PERIOD | lambda
+tempSpec -> NUM DEGREES | GAS_MARK NUM | THERMOSTAT NUM | STUFE NUM
+method -> METHOD PERIOD methods
+methods -> put methods | fold methods | clean methods | lambda
+put -> PUT wordList INTO NUMBERST MIXINGBOWL | PUT wordList INTO MIXINGBOWL
+fold -> FOLD wordList INTO NUMBERST MIXINGBOWL | FOLD wordList INTO MIXINGBOWL
+clean -> CLEAN NUMBERST MIXINGBOWL | CLEAN MIXINGBOWL
+optionalServes -> SERVES NUM PERIOD | lambda
+wordList -> WORD wordList | WORD

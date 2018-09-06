@@ -1,0 +1,32 @@
+METHOD -> \bMethod\b
+TITLE -> ^(?!Ingredients\.)(\w|\s)+\.
+COMMENT -> (?<=^(\w|\s)+\.\s+)(\w)((\w|\s|\,|-)+\.)(\s)+
+COOKING_TIME -> \bCooking\s+time\b
+PREHEAT_OVEN_TO -> \bPre-heat\s+oven\s+to\b
+NUM -> \b(\d+/\d+|\d+-\d+/\d+|\d+)\b
+TIMEUNIT -> \b(hours|minutes)\b
+DEGREES -> \bdegrees\b
+GAS_MARK -> \bgas\s+mark\b
+THERMOSTAT -> \b(thermostat|Th)\b
+STUFE -> \bStufe\b
+SERVES -> \bServes\b
+DESCRIPTIVE -> \b(heaped|heaping|packed|level)\b
+MEASURE -> \b(oz|lb|pinch|pinches|quart|quarts|dash|dashes|cup|cups|teaspoon|teaspoons|tablespoon|tablespoons|tsp|T|t|tbsp)\b
+WORD -> \b([a-z]+)\b
+COLON -> :
+PERIOD -> \.
+
+S -> TITLE temp ingredients cookingTime preheat method serves
+temp -> COMMENT | lambda
+ingredients -> ingredientList
+ingredientList -> ingredient ingredientList | lambda
+ingredient -> optionalInitialValue optionalMeasureType wordList PERIOD
+optionalMeasureType -> optionalDescriptive MEASURE | lambda
+optionalDescriptive -> DESCRIPTIVE | lambda
+optionalInitialValue -> NUM | lambda
+cookingTime -> COOKING_TIME COLON NUM TIMEUNIT PERIOD | lambda
+preheat -> PREHEAT_OVEN_TO tempSpec PERIOD | lambda
+tempSpec -> NUM DEGREES | GAS_MARK NUM | THERMOSTAT NUM | STUFE NUM
+method -> METHOD PERIOD
+serves -> SERVES NUM PERIOD | lambda
+wordList -> WORD wordList | WORD

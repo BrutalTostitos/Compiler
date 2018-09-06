@@ -1,0 +1,14 @@
+TITLE -> ^((\w+)\s)+\d+[.]
+TIME -> Cooking time:\s+\d+\s\w+[.]
+INGREDIENTS -> \bIngredients\b(\w*\s*)[.]
+METHOD -> \bMethod\b[.]
+SERVES -> \bServes\b\s+\d+[.]
+SPECIFICATION -> \d+\s\bdegrees\b\.|\bgas\b\s*\bmark\b\s*\d+\.|(\bthermostat\b|\bTh\b)\s*\d+\.|\bStufe\b\s*\d+\.
+COMMENT -> \w(\w|\s|\,)+\.
+PREHEAT -> Pre-heat\s+oven\s+to\s+
+NEWLINE -> \s+
+
+
+
+S->TITLE NEWLINE COMMENT NEWLINE INGREDIENTS NEWLINE TIME NEWLINE PREHEAT SPECIFICATION NEWLINE METHOD NEWLINE SERVES NEWLINE
+

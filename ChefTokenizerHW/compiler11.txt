@@ -1,0 +1,106 @@
+#define ordinal \b(1st|2nd|3rd|\d*[02-9]1st|\d*[02-9]2nd|\d*[02-9]3rd|\d*[4-9]th|\d*[1-9]\d*0th|\d*1[1-3]th)\b
+TITLE_AND_COMMENT -> ^(
+    (?!\s*Ingredients\.)(?!\s*Cooking\s+time\b)(?!\s*Pre-heat\s+oven\s+to\b)(?!\s*Method)
+    [^.]+\.)
+    (
+        (?!\s*Ingredients\.)(?!\s*Cooking\s+time\b)(?!\s*Pre-heat\s+oven\s+to\b)(?!\s*Method)
+        [^.]+\.
+    )?
+COLON -> :
+PERIOD -> \.
+COOKING_TIME -> \bCooking\s+time\b
+PUT_OR_FOLD -> \b(put|fold)\b
+ADD_DRY_INGREDIENTS -> \badd\s+dry\s+ingredients
+THE -> \bthe\b
+UNTIL -> \buntil\b
+SET_ASIDE -> \bset\s+aside\b
+LIQUEFY_CONTENTS -> \bliquefy\s+contents\s+of\s+the\s+((?#ordinal)\s+)?mixing\s+bowl\b
+LIQUEFY -> \bliquefy\b
+FROM_REFRIGERATOR -> \bfrom\s+refrigerator\b
+POUR_CONTENTS -> \bpour\s+contents\s+of\s+((?#ordinal)\s+)?mixing\s+bowl\s+into\s+(the\s+)?((?#ordinal)\s+)?baking\s+dish\b
+CLEAN_MIXING_BOWL -> \bclean\s+mixing\s+bowl\b
+CLEAN_NTH_MIXING_BOWL -> \bclean\s+(?#ordinal)\s+mixing\s+bowl\b
+TO_MIXING_BOWL -> \bto\s+mixing\s+bowl\b
+TO_NTH_MIXING_BOWL -> \bto\s+(?#ordinal)\s+mixing\s+bowl\b
+FROM_MIXING_BOWL -> \bfrom\s+mixing\s+bowl\b
+FROM_NTH_MIXING_BOWL -> \bfrom\s+(?#ordinal)\s+mixing\s+bowl\b
+INTO_MIXING_BOWL -> \binto\s+mixing\s+bowl\b
+INTO_NTH_MIXING_BOWL -> \binto\s+(?#ordinal)\s+mixing\s+bowl\b
+STIR_FOR -> \bstir\s+for\b
+STIR_THE_MIXING_BOWL_FOR -> \bstir\s+the\s+mixing\s+bowl\s+for\b
+STIR_THE_NTH_MIXING_BOWL_FOR -> \bstir\s+the\s+(?#ordinal)\s+mixing\s+bowl\s+for\b
+INTO_THE_MIXING_BOWL -> \binto\s+the\s+mixing\s+bowl
+INTO_THE_NTH_MIXING_BOWL -> \binto\s+the\s+(?#ordinal)\s+mixing\s+bowl
+MIX_WELL -> \bmix\s+well\b
+MIX_THE_MIXING_BOWL_WELL -> \bmix\s+the\s+mixing\s+bowl\s+well\b
+MIX_THE_NTH_MIXING_BOWL_WELL -> \bmix\s+the\s+(?#ordinal)\s+mixing\s+bowl\s+well\b
+INGREDIENTS -> \bIngredients\b
+PREHEAT_OVEN_TO -> \bPre-heat\s+oven\s+to\b
+NUM -> \b(\d+/\d+|\d+-\d+/\d+|\d+)\b
+TIME_UNIT -> \b(hours?|minutes?|seconds?)\b
+DEGREES -> \bdegrees\b
+GAS_MARK -> \bgas\s+mark\b
+THERMOSTAT -> \b(thermostat|Th)\b
+STUFE -> \bStufe\b
+REFRIGERATE -> \brefrigerate\b
+REFRIGERATED -> \brefrigerated\b
+ENDSERVE-> \bServes you right\b
+SERVE-> \bServe\b
+SERVES -> \bServes\b
+METHOD -> \bMethod\b
+DESCRIPTIVE -> \b(heaped|heaping|packed|level)\b
+MEASURE -> \b(oz|lb|pinch|pinches|quart|quarts|dash|dashes|cup|cups|teaspoon|teaspoons|tablespoon|tablespoons|tsp|T|t|tbsp)\b
+ADD -> \badd\b
+REMOVE -> \bremove\b
+COMBINE -> \bcombine\b
+DIVIDE -> \bdivide\b
+TAKE -> \btake\b
+STIR -> \bstir\b
+WORD -> \b([a-z]+)\b
+
+S -> TITLE_AND_COMMENT 
+    optionalIngredients 
+    optionalCookingTime 
+    optionalPreheat 
+    method
+    optionalServes
+optionalIngredients -> INGREDIENTS PERIOD ingredientList | lambda
+ingredientList -> ingredient ingredientList | lambda
+ingredient -> optionalInitialValue optionalMeasureType wordList PERIOD
+optionalMeasureType -> optionalDescriptive MEASURE | lambda
+optionalDescriptive -> DESCRIPTIVE | lambda
+optionalInitialValue -> NUM | lambda
+optionalCookingTime -> COOKING_TIME COLON NUM TIME_UNIT PERIOD | lambda
+optionalPreheat -> PREHEAT_OVEN_TO tempSpec PERIOD | lambda
+tempSpec -> NUM DEGREES | GAS_MARK NUM | THERMOSTAT NUM | STUFE NUM
+method -> METHOD PERIOD stmt-list
+stmt-list -> stmt PERIOD stmt-list | lambda
+stmt -> putStmt | cleanStmt | mathStmt | stirStmt | mixStmt | liquefyStmt | takeStmt | serveStmt | refrigStmt | garbageStmt
+        | SET_ASIDE
+garbageStmt -> wordList
+refrigStmt -> REFRIGERATE wordList | REFRIGERATE THE wordList | REFRIGERATE THE wordList UNTIL REFRIGERATED | REFRIGERATE wordList NUM TIME_UNIT | REFRIGERATE |lambda
+putStmt -> PUT_OR_FOLD wordList INTO_MIXING_BOWL |
+           PUT_OR_FOLD wordList INTO_NTH_MIXING_BOWL
+cleanStmt -> CLEAN_MIXING_BOWL |
+             CLEAN_NTH_MIXING_BOWL
+mathStmt -> addStmt | subStmt | mulStmt | divStmt | pourStmt | loopStmt
+addStmt -> ADD wordList | ADD wordList TO_MIXING_BOWL | ADD wordList TO_NTH_MIXING_BOWL |
+           ADD_DRY_INGREDIENTS | ADD_DRY_INGREDIENTS TO_MIXING_BOWL |
+           ADD_DRY_INGREDIENTS TO_NTH_MIXING_BOWL 
+subStmt -> REMOVE wordList | REMOVE wordList FROM_MIXING_BOWL | REMOVE wordList FROM_NTH_MIXING_BOWL
+mulStmt -> COMBINE wordList | COMBINE wordList INTO_MIXING_BOWL | COMBINE wordList INTO_NTH_MIXING_BOWL
+divStmt -> DIVIDE wordList | DIVIDE wordList INTO_MIXING_BOWL | DIVIDE wordList INTO_NTH_MIXING_BOWL
+serveStmt -> SERVE wordList ENDSERVE | SERVE wordList | SERVES NUM | ENDSERVE
+optionalServes ->  SERVES NUM PERIOD | SERVES NUM PERIOD optionalServes | optionalIngredients optionalServes | stmt-list optionalServes | optionalCookingTime optionalServes | optionalPreheat optionalServes | method optionalServes | lambda
+wordList -> WORD wordList | WORD
+stirStmt -> STIR_FOR NUM TIME_UNIT | STIR_THE_MIXING_BOWL_FOR NUM TIME_UNIT |
+            STIR_THE_NTH_MIXING_BOWL_FOR NUM TIME_UNIT |
+            STIR wordList INTO_THE_MIXING_BOWL |
+            STIR wordList INTO_THE_NTH_MIXING_BOWL
+mixStmt -> MIX_WELL | MIX_THE_MIXING_BOWL_WELL | MIX_THE_NTH_MIXING_BOWL_WELL
+pourStmt -> POUR_CONTENTS
+liquefyStmt -> LIQUEFY wordList | LIQUEFY_CONTENTS
+takeStmt -> TAKE wordList FROM_REFRIGERATOR
+loopStmt -> verb THE wordList PERIOD stmt-list verb UNTIL verb  |
+            verb THE wordList PERIOD stmt-list verb THE wordList UNTIL verb
+verb -> WORD | ADD | REMOVE | COMBINE | DIVIDE | TAKE | STIR

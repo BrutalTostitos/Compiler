@@ -1,0 +1,12 @@
+NUM -> \d+
+ID -> [A-Za-z]\w*
+LP -> [(]
+RP -> [)]
+ADDOP -> [-+]
+MULOP -> [*/]
+
+expr -> term expr'
+expr' -> ADDOP term expr' | λ
+term -> factor term' 
+term' -> MULOP factor term' | λ
+factor -> ID | LP expr RP | NUM

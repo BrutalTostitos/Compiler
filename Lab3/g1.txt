@@ -1,0 +1,13 @@
+NUM -> \d+
+ADDOP -> [-+]
+MULOP -> [*/]
+LP -> \(
+RP -> \)
+EQ -> =
+ID -> [A-Z]\w*
+comment -> \{[^}]*\}
+
+S -> ID EQ expr
+expr -> expr ADDOP term | term
+term -> term MULOP factor | factor
+factor -> ID | NUM | LP expr RP

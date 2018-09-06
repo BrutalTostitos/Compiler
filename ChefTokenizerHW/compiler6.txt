@@ -1,0 +1,63 @@
+TITLE_AND_COMMENT -> ^(
+    (?!\s*Ingredients\.)(?!\s*Cooking\s+time\b)(?!\s*Pre-heat\s+oven\s+to\b)(?!\s*Method)
+    [^.]+\.)
+    (
+        (?!\s*Ingredients\.)(?!\s*Cooking\s+time\b)(?!\s*Pre-heat\s+oven\s+to\b)(?!\s*Method)
+        [^.]+\.
+    )?
+COOKING_TIME -> \bCooking\s+time\b
+PUT_OR_FOLD -> \b(put|fold)\b
+INTO -> \binto\b(?=\s+(\b(1st|2nd|3rd|\d*[02-9]1st|\d*[02-9]2nd|\d*[02-9]3rd|\d*[4-9]th|\d*[1-9]\d*0th|\d*1[1-3]th)\b\s+|)\bmixing\s+bowl\b)
+MIXING_BOWL -> \bmixing\s+bowl\b
+CLEAN -> \bclean\b
+ADD -> \bAdd\b
+REMOVE -> \bRemove\b
+COMBINE -> \bCombine\b
+DIVIDE -> \bDivide\b
+TO -> \bto\b(?=\s+(\b(1st|2nd|3rd|\d*[02-9]1st|\d*[02-9]2nd|\d*[02-9]3rd|\d*[4-9]th|\d*[1-9]\d*0th|\d*1[1-3]th)\b\s+|)\bmixing\s+bowl\b)
+FROM -> \bfrom\b(?=\s+(\b(1st|2nd|3rd|\d*[02-9]1st|\d*[02-9]2nd|\d*[02-9]3rd|\d*[4-9]th|\d*[1-9]\d*0th|\d*1[1-3]th)\b\s+|)\bmixing\s+bowl\b)
+DRY -> dry\s+ingredients
+ORDINAL -> \b(1st|2nd|3rd|\d*[02-9]1st|\d*[02-9]2nd|\d*[02-9]3rd|\d*[4-9]th|\d*[1-9]\d*0th|\d*1[1-3]th)\b
+INGREDIENTS -> \bIngredients\b
+PREHEAT_OVEN_TO -> \bPre-heat\s+oven\s+to\b
+NUM -> \b(\d+/\d+|\d+-\d+/\d+|\d+)\b
+TIMEUNIT -> \b(hours|minutes)\b
+DEGREES -> \bdegrees\b
+GAS_MARK -> \bgas\s+mark\b
+THERMOSTAT -> \b(thermostat|Th)\b
+STUFE -> \bStufe\b
+SERVES -> \bServes\b
+METHOD -> \bMethod\b
+DESCRIPTIVE -> \b(heaped|heaping|packed|level)\b
+MEASURE -> \b(oz|lb|pinch|pinches|quart|quarts|dash|dashes|cup|cups|teaspoon|teaspoons|tablespoon|tablespoons|tsp|T|t|tbsp)\b
+WORD -> \b([a-z]+)\b
+COLON -> :
+PERIOD -> \.
+
+S -> TITLE_AND_COMMENT 
+    optionalIngredients 
+    optionalCookingTime 
+    optionalPreheat 
+    method 
+    optionalServes
+optionalIngredients -> INGREDIENTS PERIOD ingredientList | lambda
+ingredientList -> ingredient ingredientList | lambda
+ingredient -> optionalInitialValue optionalMeasureType wordList PERIOD
+optionalMeasureType -> optionalDescriptive MEASURE | lambda
+optionalDescriptive -> DESCRIPTIVE | lambda
+optionalInitialValue -> NUM | lambda
+optionalCookingTime -> COOKING_TIME COLON NUM TIMEUNIT PERIOD | lambda
+optionalPreheat -> PREHEAT_OVEN_TO tempSpec PERIOD | lambda
+tempSpec -> NUM DEGREES | GAS_MARK NUM | THERMOSTAT NUM | STUFE NUM
+method -> METHOD PERIOD stmt-list
+stmt-list -> stmt PERIOD stmt-list | lambda
+stmt -> putStmt | cleanStmt | addStmt | removeStmt | combineStmt | divideStmt
+putStmt -> PUT_OR_FOLD wordList INTO optionalOrdinal MIXING_BOWL
+optionalOrdinal -> lambda | ORDINAL
+cleanStmt -> CLEAN optionalOrdinal MIXING_BOWL
+addStmt -> ADD DRY | ADD DRY TO optionalOrdinal MIXING_BOWL | ADD wordList TO optionalOrdinal MIXING_BOWL | ADD wordList
+removeStmt -> REMOVE wordList | REMOVE wordList FROM optionalOrdinal MIXING_BOWL
+combineStmt -> COMBINE wordList | COMBINE wordList INTO optionalOrdinal MIXING_BOWL
+divideStmt -> DIVIDE wordList | DIVIDE wordList INTO optionalOrdinal MIXING_BOWL
+optionalServes -> SERVES NUM PERIOD | lambda
+wordList -> WORD wordList | WORD

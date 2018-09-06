@@ -1,0 +1,25 @@
+TITLE -> ^[^.]+\.[^.]+\.
+TIME -> Cooking time:\s+\d+\s\w+[.]
+SPECIFICATION -> \d+\s\bdegrees\b\.|\bgas\b\s*\bmark\b\s*\d+\.|(\bthermostat\b|\bTh\b)\s*\d+\.|\bStufe\b\s*\d+\.
+INGREDIENTS -> \bIngredients\b(\w*\s*)[.]
+INGREDIENTCOUNT -> \d+\/\d+/s?|\d+-\d+\/\d+|\d+/s?|lambda
+MEASUREMENT -> \soz\s|\slb\s|pinch(es)?\s|\squart(s)?\s|\sdash(es)?\s|\scup(s)?\s|\steaspoon(s)?\s|\stablespoon(s)?\s|\stsp\s|\sT\s|\st\s|\stbsp\s
+METHOD -> \bMethod\b[.]
+SERVES -> \bServes\b\s+\d+[.]
+ITEM -> \w+(\s+\w+)*\.
+PREHEAT -> Pre-heat\s+oven\s+to\s+
+NEWLINE -> \s+
+
+
+
+S->TITLE ingredients cookingTime preheat method serves
+ingredients -> NEWLINE INGREDIENTS NEWLINE ingredientList
+ingredientList -> ingredientList INGREDIENTCOUNT MEASUREMENT ITEM NEWLINE|ingredientList MEASUREMENT ITEM NEWLINE|ingredientList ITEM NEWLINE|ingredientList INGREDIENTCOUNT ITEM NEWLINE|ingredientList MEASUREMENT ITEM NEWLINE|INGREDIENTCOUNT MEASUREMENT ITEM NEWLINE| lambda
+cookingTime -> TIME NEWLINE
+preheat -> PREHEAT SPECIFICATION NEWLINE
+method -> METHOD NEWLINE
+serves -> SERVES NEWLINE
+
+
+
+
